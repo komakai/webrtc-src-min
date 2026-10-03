@@ -44,7 +44,6 @@ add_library(webrtc_rtc_base OBJECT
   experiments/struct_parameters_parser.cc
   file_rotating_stream.cc
   frequency_tracker.cc
-  ifaddrs_android.cc
   ifaddrs_converter.cc
   internal/default_socket_server.cc
   ip_address.cc
@@ -104,9 +103,7 @@ add_library(webrtc_rtc_base OBJECT
   synchronization/yield_policy.cc
   system/file_wrapper.cc
   system/system_time.cc
-  system/warn_current_thread_is_deadlocked.cc
   system_time.cc
-  task_queue_stdlib.cc
   task_utils/repeating_task.cc
   text2pcap.cc
   thread.cc
@@ -117,4 +114,24 @@ add_library(webrtc_rtc_base OBJECT
   weak_ptr.cc
   zero_memory.cc
 )
-target_link_libraries(webrtc_rtc_base PRIVATE webrtc_config boringssl ndk_compat)
+target_link_libraries(webrtc_rtc_base PRIVATE webrtc_config boringssl)
+if(ANDROID)
+  target_link_libraries(webrtc_rtc_base PRIVATE ndk_compat)
+endif()
+
+if(ANDROID)
+  target_sources(webrtc_rtc_base PRIVATE
+    ifaddrs_android.cc
+    system/warn_current_thread_is_deadlocked.cc
+    task_queue_stdlib.cc
+  )
+endif()
+
+if(APPLE)
+  target_sources(webrtc_rtc_base PRIVATE
+    mac_ifaddrs_converter.cc
+    system/cocoa_threading.mm
+    system/gcd_helpers.m
+    task_queue_gcd.cc
+  )
+endif()

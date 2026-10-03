@@ -1,10 +1,13 @@
-# WebRTC's Android library, libjingle_peerconnection_so.so, built from the
-# sources of the gn targets it depends on (one OBJECT library per directory,
-# and per modules/ subdirectory). Needs the targets from webrtc-third_party-min
-# (absl, boringssl, libyuv, ...) and the compile flags from webrtc-min's
-# top-level CMakeLists.txt.
+# WebRTC's Android library, libjingle_peerconnection_so.so, or its iOS
+# framework, WebRTC.framework, built from the sources of the gn targets they
+# depend on (one OBJECT library per directory, and per modules/ subdirectory).
+# Needs the targets from webrtc-third_party-min (absl, boringssl, libyuv, ...)
+# and the compile flags from webrtc-min's top-level CMakeLists.txt.
 cmake_minimum_required(VERSION 3.22)
 project(webrtc C CXX ASM)
+if(APPLE)
+  enable_language(OBJC OBJCXX)
+endif()
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64)")
   set(WEBRTC_CPU arm64)
@@ -27,7 +30,6 @@ target_compile_definitions(webrtc_config INTERFACE
   PROTOBUF_ENABLE_DEBUG_LOGGING_MAY_LEAK_PII=0
   RTC_DAV1D_IN_INTERNAL_DECODER_FACTORY
   RTC_ENABLE_VP9
-  WEBRTC_ANDROID
   WEBRTC_APM_DEBUG_DUMP=0
   WEBRTC_CODEC_OPUS
   WEBRTC_DEPRECATE_PLAN_B
@@ -38,7 +40,6 @@ target_compile_definitions(webrtc_config INTERFACE
   WEBRTC_HAVE_SCTP
   WEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE
   WEBRTC_LIBRARY_IMPL
-  WEBRTC_LINUX
   WEBRTC_NON_STATIC_TRACE_EVENT_HANDLERS=0
   WEBRTC_NO_SOFTWARE_VIDEO_CODECS
   WEBRTC_OPUS_SUPPORT_120MS_PTIME=1
@@ -48,6 +49,14 @@ target_compile_definitions(webrtc_config INTERFACE
   WEBRTC_USE_BUILTIN_OPUS=1
   WEBRTC_WITHOUT_RUST
 )
+if(ANDROID)
+  target_compile_definitions(webrtc_config INTERFACE WEBRTC_ANDROID WEBRTC_LINUX)
+elseif(IOS)
+  target_compile_definitions(webrtc_config INTERFACE
+    WEBRTC_IOS WEBRTC_MAC WEBRTC_ENABLE_OBJC_SYMBOL_EXPORT)
+else()
+  message(FATAL_ERROR "webrtc: only Android and iOS are supported")
+endif()
 if(WEBRTC_CPU STREQUAL "arm64")
   target_compile_definitions(webrtc_config INTERFACE WEBRTC_ARCH_ARM64 WEBRTC_HAS_NEON)
 elseif(WEBRTC_CPU STREQUAL "arm")
@@ -74,7 +83,9 @@ add_subdirectory(modules/remote_bitrate_estimator)
 add_subdirectory(modules/rtp_rtcp)
 add_subdirectory(modules/sframe)
 add_subdirectory(modules/third_party)
-add_subdirectory(modules/utility)
+if(ANDROID)
+  add_subdirectory(modules/utility)  # JNI helpers only
+endif()
 add_subdirectory(modules/video_capture)
 add_subdirectory(modules/video_coding)
 add_subdirectory(net)

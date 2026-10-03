@@ -56,3 +56,10 @@ add_library(webrtc_modules_video_coding OBJECT
   video_receiver2.cc
 )
 target_link_libraries(webrtc_modules_video_coding PRIVATE webrtc_config)
+
+if(APPLE)
+  target_sources(webrtc_modules_video_coding PRIVATE
+    codecs/h264/h264.cc
+    codecs/h264/h264_color_space.cc
+  )
+endif()

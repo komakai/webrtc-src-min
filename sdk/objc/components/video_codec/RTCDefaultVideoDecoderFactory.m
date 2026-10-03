@@ -13,12 +13,16 @@
 #import "RTCH264ProfileLevelId.h"
 #import "RTCVideoDecoderH264.h"
 #import "api/video_codec/RTCVideoCodecConstants.h"
+#import "base/RTCVideoCodecInfo.h"
+
+// Without software video codecs (libvpx, dav1d) only H.264 is offered.
+#if !defined(WEBRTC_NO_SOFTWARE_VIDEO_CODECS)
 #import "api/video_codec/RTCVideoDecoderVP8.h"
 #import "api/video_codec/RTCVideoDecoderVP9.h"
-#import "base/RTCVideoCodecInfo.h"
 
 #if defined(RTC_DAV1D_IN_INTERNAL_DECODER_FACTORY)
 #import "api/video_codec/RTCVideoDecoderAV1.h"  // nogncheck
+#endif
 #endif
 
 @implementation RTC_OBJC_TYPE (RTCDefaultVideoDecoderFactory)
@@ -29,6 +33,7 @@
 
   [result
       addObjectsFromArray:[RTC_OBJC_TYPE(RTCVideoDecoderH264) supportedCodecs]];
+#if !defined(WEBRTC_NO_SOFTWARE_VIDEO_CODECS)
   [result
       addObjectsFromArray:[RTC_OBJC_TYPE(RTCVideoDecoderVP8) supportedCodecs]];
 
@@ -39,6 +44,7 @@
   [result
       addObjectsFromArray:[RTC_OBJC_TYPE(RTCVideoDecoderAV1) supportedCodecs]];
 #endif
+#endif
 
   return result;
 }
@@ -47,7 +53,9 @@
     (RTC_OBJC_TYPE(RTCVideoCodecInfo) *)info {
   if ([info.name isEqualToString:kRTCVideoCodecH264Name]) {
     return [[RTC_OBJC_TYPE(RTCVideoDecoderH264) alloc] init];
-  } else if ([info.name isEqualToString:kRTCVideoCodecVp8Name]) {
+  }
+#if !defined(WEBRTC_NO_SOFTWARE_VIDEO_CODECS)
+  if ([info.name isEqualToString:kRTCVideoCodecVp8Name]) {
     return [RTC_OBJC_TYPE(RTCVideoDecoderVP8) vp8Decoder];
   } else if ([info.name isEqualToString:kRTCVideoCodecVp9Name] &&
              [RTC_OBJC_TYPE(RTCVideoDecoderVP9) isSupported]) {
@@ -58,6 +66,7 @@
   if ([info.name isEqualToString:kRTCVideoCodecAv1Name]) {
     return [RTC_OBJC_TYPE(RTCVideoDecoderAV1) av1Decoder];
   }
+#endif
 #endif
 
   return nil;

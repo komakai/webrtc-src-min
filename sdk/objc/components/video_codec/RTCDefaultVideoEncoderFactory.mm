@@ -14,8 +14,11 @@
 #import "RTCVideoEncoderH264.h"
 #import "api/peerconnection/RTCVideoCodecInfo+Private.h"
 #import "api/video_codec/RTCVideoCodecConstants.h"
+// Without software video codecs (libvpx, libaom) only H.264 is offered.
+#if !defined(WEBRTC_NO_SOFTWARE_VIDEO_CODECS)
 #import "api/video_codec/RTCVideoEncoderVP8.h"
 #import "api/video_codec/RTCVideoEncoderVP9.h"
+#endif
 #import "base/RTCVideoCodecInfo.h"
 #import "helpers/NSString+StdString.h"
 
@@ -36,11 +39,13 @@
 
   [result
       addObjectsFromArray:[RTC_OBJC_TYPE(RTCVideoEncoderH264) supportedCodecs]];
+#if !defined(WEBRTC_NO_SOFTWARE_VIDEO_CODECS)
   [result
       addObjectsFromArray:[RTC_OBJC_TYPE(RTCVideoEncoderVP8) supportedCodecs]];
 
   [result
       addObjectsFromArray:[RTC_OBJC_TYPE(RTCVideoEncoderVP9) supportedCodecs]];
+#endif
 
 #if defined(RTC_USE_LIBAOM_AV1_ENCODER)
   [result
@@ -54,12 +59,15 @@
     (RTC_OBJC_TYPE(RTCVideoCodecInfo) *)info {
   if ([info.name isEqualToString:kRTCVideoCodecH264Name]) {
     return [[RTC_OBJC_TYPE(RTCVideoEncoderH264) alloc] initWithCodecInfo:info];
-  } else if ([info.name isEqualToString:kRTCVideoCodecVp8Name]) {
+  }
+#if !defined(WEBRTC_NO_SOFTWARE_VIDEO_CODECS)
+  if ([info.name isEqualToString:kRTCVideoCodecVp8Name]) {
     return [RTC_OBJC_TYPE(RTCVideoEncoderVP8) vp8Encoder];
   } else if ([info.name isEqualToString:kRTCVideoCodecVp9Name] &&
              [RTC_OBJC_TYPE(RTCVideoEncoderVP9) isSupported]) {
     return [RTC_OBJC_TYPE(RTCVideoEncoderVP9) vp9Encoder];
   }
+#endif
 
 #if defined(RTC_USE_LIBAOM_AV1_ENCODER)
   if ([info.name isEqualToString:kRTCVideoCodecAv1Name]) {

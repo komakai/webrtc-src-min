@@ -1,7 +1,7 @@
 # RECIPE: webrtc-src-min
 
 How the `main-min` branch of this repository was made from upstream, and
-everything that differs from it. It is the WebRTC submodule of [webrtc-min](https://github.com/komakai/webrtc-min), which builds the Android library `libjingle_peerconnection_so.so` with CMake instead of gn.
+everything that differs from it. It is the WebRTC submodule of [webrtc-min](https://github.com/komakai/webrtc-min), which builds the Android library `libjingle_peerconnection_so.so` and the iOS framework `WebRTC.framework` with CMake instead of gn.
 
 ## Upstream
 
@@ -87,9 +87,34 @@ git ls-files | grep -E \
     few gn sets only on some targets (e.g. `WEBRTC_HAVE_DCSCTP`,
     `WEBRTC_APM_DEBUG_DUMP=0`); each was checked to be unused by files outside
     those targets.
-  - Only Android is supported: no iOS/desktop sources or flags, software
-    video codecs, protobuf (so no RtcEventLog output or audio debug dumps),
-    Rust, tests or tools.
+  - Android and iOS are supported (no desktop), without software video
+    codecs, protobuf (so no RtcEventLog output or audio debug dumps), Rust,
+    tests or tools.
+
+- **iOS** (commit "Support iOS"):
+  - The CMake files put each directory's Android-only sources (JNI helpers,
+    `ifaddrs_android.cc`, the stdlib task queue, ...) under `if(ANDROID)` and
+    add iOS's (the GCD task queue, `cocoa_threading.mm`,
+    `mac_ifaddrs_converter.cc`, ...) under `if(APPLE)`, from the sources gn
+    compiles for `//sdk:framework_objc` (iOS arm64, `rtc_enable_protobuf =
+    false`). `webrtc_config` gets gn's iOS defines (`WEBRTC_IOS`,
+    `WEBRTC_MAC`, `WEBRTC_ENABLE_OBJC_SYMBOL_EXPORT`); `modules/utility` is
+    Android-only.
+  - `sdk/CMakeLists.txt` builds `WebRTC.framework` from the 117 `sdk/objc`
+    sources gn compiles (ARC, as in gn), without the VP8/VP9/AV1 classes. Its
+    public headers are gn's `common_objc_headers` without the VP8/VP9/AV1
+    ones, copied flat with `#import "sdk/objc/.../RTCFoo.h"` rewritten to
+    `#import <WebRTC/RTCFoo.h>` (as `tools_webrtc/apple/copy_framework_header.py`
+    does), plus a generated umbrella header `WebRTC.h` and module map. It's
+    linked like gn's (all objects, `-dead_strip`, install name
+    `@rpath/WebRTC.framework/WebRTC`) and exports the same `RTC*` classes as
+    gn's framework minus those six.
+  - `sdk/objc/Info.plist.in`: `sdk/objc/Info.plist` with the keys gn adds
+    when building (`MinimumOSVersion`, `CFBundleSupportedPlatforms`,
+    `UIDeviceFamily`). `sdk/objc/PrivacyInfo.xcprivacy`: the privacy
+    manifest gn generates with `tools_webrtc/apple/generate_privacy_manifest.py`.
+  - `RTCDefaultVideoEncoderFactory.mm` / `RTCDefaultVideoDecoderFactory.m`
+    offer only H.264 when `WEBRTC_NO_SOFTWARE_VIDEO_CODECS` is defined.
 
 ## Updating to a new upstream revision
 

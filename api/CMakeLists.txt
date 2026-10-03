@@ -31,7 +31,6 @@ add_library(webrtc_api OBJECT
   call/transport.cc
   candidate.cc
   create_modular_peer_connection_factory.cc
-  create_peerconnection_factory.cc
   crypto/crypto_options.cc
   data_channel_interface.cc
   dtls_transport_interface.cc
@@ -39,7 +38,6 @@ add_library(webrtc_api OBJECT
   environment/deprecated_global_field_trials.cc
   environment/environment_factory.cc
   environment/force_test_environment.cc
-  field_trials.cc
   field_trials_registry.cc
   frame_transformer_interface.cc
   jsep.cc
@@ -68,7 +66,6 @@ add_library(webrtc_api OBJECT
   stats/rtc_stats.cc
   stats/rtc_stats_report.cc
   stats/rtcstats_objects.cc
-  task_queue/default_task_queue_factory_stdlib.cc
   task_queue/pending_task_safety_flag.cc
   task_queue/task_queue_base.cc
   transport/bitrate_settings.cc
@@ -121,13 +118,27 @@ add_library(webrtc_api OBJECT
   video_codecs/video_codec.cc
   video_codecs/video_decoder.cc
   video_codecs/video_decoder_factory.cc
-  video_codecs/video_decoder_software_fallback_wrapper.cc
   video_codecs/video_encoder.cc
   video_codecs/video_encoder_factory.cc
-  video_codecs/video_encoder_software_fallback_wrapper.cc
   video_codecs/vp8_frame_config.cc
   video_codecs/vp8_temporal_layers.cc
   video_codecs/vp9_profile.cc
   webrtc_sdp.cc
 )
 target_link_libraries(webrtc_api PRIVATE webrtc_config libyuv)
+
+if(ANDROID)
+  target_sources(webrtc_api PRIVATE
+    create_peerconnection_factory.cc
+    field_trials.cc
+    task_queue/default_task_queue_factory_stdlib.cc
+    video_codecs/video_decoder_software_fallback_wrapper.cc
+    video_codecs/video_encoder_software_fallback_wrapper.cc
+  )
+endif()
+
+if(APPLE)
+  target_sources(webrtc_api PRIVATE
+    task_queue/default_task_queue_factory_gcd.cc
+  )
+endif()
