@@ -13,7 +13,9 @@
 #include <memory>
 
 #include "api/environment/environment.h"
+#if !defined(WEBRTC_NO_SOFTWARE_VIDEO_CODECS)
 #include "api/video_codecs/builtin_video_decoder_factory.h"
+#endif
 #include "api/video_codecs/video_decoder_factory.h"
 #include "sdk/android/generated_swcodecs_jni/SoftwareVideoDecoderFactory_jni.h"
 #include "sdk/android/native_api/jni/java_types.h"
@@ -23,8 +25,28 @@
 namespace webrtc {
 namespace jni {
 
+#if defined(WEBRTC_NO_SOFTWARE_VIDEO_CODECS)
+namespace {
+// Built without software video codecs: supports no formats.
+class EmptyVideoDecoderFactory : public VideoDecoderFactory {
+ public:
+  std::vector<SdpVideoFormat> GetSupportedFormats() const override {
+    return {};
+  }
+  std::unique_ptr<VideoDecoder> Create(const Environment& env,
+                                    const SdpVideoFormat& format) override {
+    return nullptr;
+  }
+};
+}  // namespace
+#endif
+
 static jlong JNI_SoftwareVideoDecoderFactory_CreateFactory(JNIEnv* env) {
+#if defined(WEBRTC_NO_SOFTWARE_VIDEO_CODECS)
+  return NativeToJavaPointer(new EmptyVideoDecoderFactory());
+#else
   return NativeToJavaPointer(CreateBuiltinVideoDecoderFactory().release());
+#endif
 }
 
 jboolean JNI_SoftwareVideoDecoderFactory_IsSupported(
