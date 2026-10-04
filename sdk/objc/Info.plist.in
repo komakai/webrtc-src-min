@@ -20,7 +20,7 @@
 	<string>????</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
-		<string>iPhoneOS</string>
+		<string>${WEBRTC_BUNDLE_PLATFORM}</string>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>

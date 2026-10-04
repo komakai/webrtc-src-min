@@ -1,6 +1,6 @@
 # The modules/remote_bitrate_estimator/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_remote_bitrate_estimator OBJECT
+add_library(webrtc_modules_remote_bitrate_estimator ${WEBRTC_LIBRARY_TYPE}
   aimd_rate_control.cc
   bwe_defines.cc
   congestion_control_feedback_generator.cc

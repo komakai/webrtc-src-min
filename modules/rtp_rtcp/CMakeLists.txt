@@ -1,6 +1,6 @@
 # The modules/rtp_rtcp/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_rtp_rtcp OBJECT
+add_library(webrtc_modules_rtp_rtcp ${WEBRTC_LIBRARY_TYPE}
   include/report_block_data.cc
   include/rtp_rtcp_defines.cc
   source/absolute_capture_time_interpolator.cc

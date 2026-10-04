@@ -1,6 +1,6 @@
 # The logging/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_logging OBJECT
+add_library(webrtc_logging ${WEBRTC_LIBRARY_TYPE}
   rtc_event_log/encoder/bit_writer.cc
   rtc_event_log/encoder/rtc_event_log_encoder_common.cc
   rtc_event_log/encoder/var_int.cc

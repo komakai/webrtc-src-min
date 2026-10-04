@@ -1,6 +1,6 @@
 # The api/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_api OBJECT
+add_library(webrtc_api ${WEBRTC_LIBRARY_TYPE}
   adaptation/resource.cc
   audio/audio_frame.cc
   audio/audio_processing.cc

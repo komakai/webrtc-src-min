@@ -1,6 +1,6 @@
 # The rtc_base/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_rtc_base OBJECT
+add_library(webrtc_rtc_base ${WEBRTC_LIBRARY_TYPE}
   async_dns_resolver.cc
   async_packet_socket.cc
   async_socket.cc

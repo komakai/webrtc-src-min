@@ -1,6 +1,6 @@
 # The modules/utility/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_utility OBJECT
+add_library(webrtc_modules_utility ${WEBRTC_LIBRARY_TYPE}
   source/helpers_android.cc
   source/jvm_android.cc
 )

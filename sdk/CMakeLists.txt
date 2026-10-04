@@ -1,6 +1,6 @@
 # The sdk/ sources of the gn targets libjingle_peerconnection_so (Android) or
 # framework_objc (iOS, WebRTC.framework) depend on, and the library itself.
-add_library(webrtc_sdk OBJECT
+add_library(webrtc_sdk ${WEBRTC_LIBRARY_TYPE}
   media_constraints.cc
 )
 target_link_libraries(webrtc_sdk PRIVATE webrtc_config boringssl libyuv)
@@ -251,8 +251,6 @@ elseif(IOS)
     objc/native/src/objc_video_track_source.mm
   )
   target_include_directories(webrtc_sdk PRIVATE objc objc/base)
-  target_compile_options(webrtc_sdk PRIVATE
-    "$<$<COMPILE_LANGUAGE:OBJC,OBJCXX>:-fobjc-arc;-fno-objc-arc-exceptions>")
 
   # The framework's public headers (gn's common_objc_headers, without the
   # VP8/VP9/AV1 ones). Like gn, copy them flat into Headers/ with their
@@ -393,6 +391,12 @@ elseif(IOS)
     MACOSX_PACKAGE_LOCATION Modules)
   set_source_files_properties(objc/PrivacyInfo.xcprivacy PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
+  # CFBundleSupportedPlatforms in objc/Info.plist.in.
+  if(CMAKE_OSX_SYSROOT MATCHES "[Ss]imulator")
+    set(WEBRTC_BUNDLE_PLATFORM iPhoneSimulator)
+  else()
+    set(WEBRTC_BUNDLE_PLATFORM iPhoneOS)
+  endif()
   # CMake copies a framework's headers and resources before compiling the
   # framework target's own sources, so it needs one; all the code comes from
   # the OBJECT libraries above.
@@ -416,8 +420,7 @@ elseif(IOS)
     MACOSX_FRAMEWORK_SHORT_VERSION_STRING 1.0
     LINKER_LANGUAGE OBJCXX
   )
-  target_link_libraries(WebRTC PRIVATE
-    webrtc_config
+  set(webrtc_libraries
     webrtc_api
     webrtc_audio
     webrtc_call
@@ -445,6 +448,10 @@ elseif(IOS)
     webrtc_sdk
     webrtc_system_wrappers
     webrtc_video
+  )
+  target_link_libraries(WebRTC PRIVATE
+    webrtc_config
+    ${webrtc_libraries}
     absl boringssl libsrtp libyuv opus pffft rnnoise sframe
     "-framework AVFoundation" "-framework AudioToolbox" "-framework CoreAudio"
     "-framework CoreFoundation" "-framework CoreGraphics" "-framework CoreMedia"
@@ -454,4 +461,10 @@ elseif(IOS)
   )
   target_link_options(WebRTC PRIVATE -Wl,-dead_strip -Wl,-ObjC
     -Wl,-install_name,@rpath/WebRTC.framework/WebRTC)
+  if(WEBRTC_LIBRARY_TYPE STREQUAL "STATIC")
+    foreach(library IN LISTS webrtc_libraries)
+      target_link_options(WebRTC PRIVATE
+        "LINKER:-force_load,$<TARGET_FILE:${library}>")
+    endforeach()
+  endif()
 endif()

@@ -1,6 +1,6 @@
 # The call/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_call OBJECT
+add_library(webrtc_call ${WEBRTC_LIBRARY_TYPE}
   adaptation/adaptation_constraint.cc
   adaptation/broadcast_resource_listener.cc
   adaptation/degradation_preference_provider.cc

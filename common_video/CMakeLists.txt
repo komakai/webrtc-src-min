@@ -1,6 +1,6 @@
 # The common_video/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_common_video OBJECT
+add_library(webrtc_common_video ${WEBRTC_LIBRARY_TYPE}
   bitrate_adjuster.cc
   frame_rate_estimator.cc
   framerate_controller.cc

@@ -1,6 +1,6 @@
 # The modules/audio_coding/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_audio_coding OBJECT
+add_library(webrtc_modules_audio_coding ${WEBRTC_LIBRARY_TYPE}
   acm2/acm_remixing.cc
   acm2/acm_resampler.cc
   acm2/audio_coding_module.cc

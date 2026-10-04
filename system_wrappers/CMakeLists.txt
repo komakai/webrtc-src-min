@@ -1,6 +1,6 @@
 # The system_wrappers/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_system_wrappers OBJECT
+add_library(webrtc_system_wrappers ${WEBRTC_LIBRARY_TYPE}
   source/clock.cc
   source/metrics.cc
 )

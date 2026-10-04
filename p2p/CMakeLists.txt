@@ -1,6 +1,6 @@
 # The p2p/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_p2p OBJECT
+add_library(webrtc_p2p ${WEBRTC_LIBRARY_TYPE}
   base/async_stun_tcp_socket.cc
   base/basic_async_resolver_factory.cc
   base/basic_ice_controller.cc

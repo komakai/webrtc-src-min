@@ -1,6 +1,6 @@
 # The modules/video_capture/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_video_capture OBJECT
+add_library(webrtc_modules_video_capture ${WEBRTC_LIBRARY_TYPE}
   device_info_impl.cc
   video_capture_factory.cc
   video_capture_impl.cc

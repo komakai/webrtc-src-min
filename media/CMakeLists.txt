@@ -1,6 +1,6 @@
 # The media/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_media OBJECT
+add_library(webrtc_media ${WEBRTC_LIBRARY_TYPE}
   base/codec.cc
   base/codec_comparators.cc
   base/codec_list.cc

@@ -1,6 +1,6 @@
 # The modules/third_party/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_third_party OBJECT
+add_library(webrtc_modules_third_party ${WEBRTC_LIBRARY_TYPE}
   fft/fft.c
   g711/g711.c
   g722/g722_decode.c

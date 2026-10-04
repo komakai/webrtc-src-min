@@ -1,6 +1,6 @@
 # The common_audio/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_common_audio OBJECT
+add_library(webrtc_common_audio ${WEBRTC_LIBRARY_TYPE}
   audio_converter.cc
   audio_util.cc
   channel_buffer.cc

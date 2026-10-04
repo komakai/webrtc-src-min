@@ -1,6 +1,6 @@
 # The modules/audio_processing/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_audio_processing OBJECT
+add_library(webrtc_modules_audio_processing ${WEBRTC_LIBRARY_TYPE}
   aec3/adaptive_fir_filter.cc
   aec3/adaptive_fir_filter_erl.cc
   aec3/aec3_common.cc

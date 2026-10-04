@@ -141,6 +141,19 @@ git ls-files | grep -E \
     manifest gn generates with `tools_webrtc/apple/generate_privacy_manifest.py`.
   - `RTCDefaultVideoEncoderFactory.mm` / `RTCDefaultVideoDecoderFactory.m`
     offer only H.264 when `WEBRTC_NO_SOFTWARE_VIDEO_CODECS` is defined.
+- **iOS simulator and the Xcode generator** (commit "Support the iOS
+  simulator and the Xcode generator"):
+  - `sdk/objc/Info.plist.in`'s `CFBundleSupportedPlatforms` is
+    `iPhoneSimulator` for simulator builds (`CMAKE_OSX_SYSROOT`).
+  - All of WebRTC's Objective-C is compiled with ARC, as in gn (before, only
+    `sdk/`'s was, not `rtc_base`'s `cocoa_threading.mm` and `gcd_helpers.m`).
+    The Xcode generator drops OBJC/OBJCXX-only compile options, so every
+    target also gets `CLANG_ENABLE_OBJC_ARC`.
+  - With the Xcode generator, each directory's library is STATIC instead of
+    OBJECT (`WEBRTC_LIBRARY_TYPE`) and force-loaded into the framework: Xcode
+    names the objects of same-named sources (`rtc_base`'s `system_time.cc`
+    and `system/system_time.cc`, `sdk`'s two `helpers` files) differently
+    than CMake's OBJECT library support expects.
 
 ## Updating to a new upstream revision
 

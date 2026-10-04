@@ -1,6 +1,6 @@
 # The modules/congestion_controller/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_congestion_controller OBJECT
+add_library(webrtc_modules_congestion_controller ${WEBRTC_LIBRARY_TYPE}
   ect1_policy.cc
   goog_cc/acknowledged_bitrate_estimator.cc
   goog_cc/acknowledged_bitrate_estimator_interface.cc

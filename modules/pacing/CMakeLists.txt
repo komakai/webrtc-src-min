@@ -1,6 +1,6 @@
 # The modules/pacing/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_pacing OBJECT
+add_library(webrtc_modules_pacing ${WEBRTC_LIBRARY_TYPE}
   bitrate_prober.cc
   interval_budget.cc
   pacing_controller.cc

@@ -1,6 +1,6 @@
 # The modules/audio_device/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_audio_device OBJECT
+add_library(webrtc_modules_audio_device ${WEBRTC_LIBRARY_TYPE}
   audio_device_buffer.cc
   audio_device_data_observer.cc
   audio_device_generic.cc

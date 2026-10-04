@@ -1,6 +1,6 @@
 # The net/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_net OBJECT
+add_library(webrtc_net ${WEBRTC_LIBRARY_TYPE}
   dcsctp/packet/chunk/abort_chunk.cc
   dcsctp/packet/chunk/chunk.cc
   dcsctp/packet/chunk/cookie_ack_chunk.cc

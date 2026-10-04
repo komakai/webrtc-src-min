@@ -7,6 +7,11 @@ cmake_minimum_required(VERSION 3.22)
 project(webrtc C CXX ASM)
 if(APPLE)
   enable_language(OBJC OBJCXX)
+  # gn compiles all of WebRTC's Objective-C with ARC (without ARC exception
+  # cleanup). The Xcode generator drops OBJC/OBJCXX-only compile options, so
+  # Xcode gets its own settings on every target (at the end of this file).
+  add_compile_options(
+    "$<$<COMPILE_LANGUAGE:OBJC,OBJCXX>:-fobjc-arc;-fno-objc-arc-exceptions>")
 endif()
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64)")
@@ -24,6 +29,18 @@ endif()
 # The defines gn's WebRTC configs set for this build: rtc_* gn args as built
 # by webrtc-min (no software video codecs, no protobuf, no Rust), plus the few
 # that gn sets only on some targets.
+# Each directory's sources are an OBJECT library, all linked into the final
+# library like gn links them (--whole-archive / -all_load). Xcode names the
+# objects of same-named sources (e.g. rtc_base's system_time.cc and
+# system/system_time.cc) differently than CMake's OBJECT library support
+# expects, so with the Xcode generator they're STATIC libraries, force-loaded
+# instead.
+if(CMAKE_GENERATOR STREQUAL "Xcode")
+  set(WEBRTC_LIBRARY_TYPE STATIC)
+else()
+  set(WEBRTC_LIBRARY_TYPE OBJECT)
+endif()
+
 add_library(webrtc_config INTERFACE)
 target_include_directories(webrtc_config INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(webrtc_config INTERFACE
@@ -95,3 +112,15 @@ add_subdirectory(rtc_base)
 add_subdirectory(sdk)
 add_subdirectory(system_wrappers)
 add_subdirectory(video)
+
+if(APPLE)
+  get_property(dirs DIRECTORY PROPERTY SUBDIRECTORIES)
+  foreach(dir IN LISTS dirs)
+    get_property(targets DIRECTORY ${dir} PROPERTY BUILDSYSTEM_TARGETS)
+    foreach(target IN LISTS targets)
+      set_target_properties(${target} PROPERTIES
+        XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
+        XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC_EXCEPTIONS NO)
+    endforeach()
+  endforeach()
+endif()

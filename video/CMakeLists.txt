@@ -1,6 +1,6 @@
 # The video/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_video OBJECT
+add_library(webrtc_video ${WEBRTC_LIBRARY_TYPE}
   adaptation/balanced_constraint.cc
   adaptation/bandwidth_quality_scaler_resource.cc
   adaptation/bitrate_constraint.cc

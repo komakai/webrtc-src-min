@@ -1,6 +1,6 @@
 # The modules/video_coding/ sources of the gn targets libjingle_peerconnection_so
 # depends on.
-add_library(webrtc_modules_video_coding OBJECT
+add_library(webrtc_modules_video_coding ${WEBRTC_LIBRARY_TYPE}
   chain_diff_calculator.cc
   codecs/av1/av1_svc_config.cc
   codecs/vp8/vp8_scalability.cc
