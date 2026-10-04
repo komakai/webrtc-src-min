@@ -62,7 +62,7 @@ git ls-files | grep -E \
 
   There are none for the software video codecs' JNI classes (libvpx, libaom,
   dav1d), as this build has no software codecs. To regenerate them for a new
-  revision, run webrtc-min's `fetch_webrtc_android.sh` (with
+  revision, run webrtc-min's `gn/fetch_webrtc_android.sh` (with
   `SOFTWARE_VIDEO_CODECS=0 PROTOBUF=0`) at that revision, build
   `libjingle_peerconnection_so` with gn/ninja, and copy
   `out/android_arm64/gen/jni_headers/{rtc_base,sdk}/` and
