@@ -68,7 +68,33 @@ git ls-files | grep -E \
   `out/android_arm64/gen/jni_headers/{rtc_base,sdk}/` and
   `out/android_arm64/gen/experiments/registered_field_trials.h` here. The
   headers must match the Java side the app is built with (the hashed `J.N`
-  proxy names come from the same generator run).
+  proxy names come from the same generator run), so regenerate
+  `sdk/android/generated_java/` (below) at the same time.
+- **Pregenerated Java** (commit "Add pregenerated Java for the AAR"):
+  `sdk/android/generated_java/`, the Java half of the same generator runs, for
+  webrtc-min's Gradle build of libwebrtc.aar:
+  - the `*Jni.java` classes from the `generate_jni` srcjars of the Java
+    targets gn's `//sdk/android:libwebrtc` jar contains (without their
+    placeholder `GEN_JNI`, and without the software video codecs' targets);
+  - `org/jni_zero/GEN_JNI.java` and `J/N.java`, from
+    `jni_zero.py generate-final --use-proxy-hash --enable-safe-pointers`
+    (gn's `//sdk/android:libjingle_peerconnection_so__jni_registration`), run
+    on that target's Java source list minus `Dav1dDecoder`,
+    `LibvpxVp8Decoder`, `LibvpxVp8Encoder`, `LibvpxVp9Decoder` and
+    `LibvpxVp9Encoder`. `J.N`'s 186 natives are exactly the `Java_J_N_*`
+    symbols the native library exports;
+  - `Priority`, `NetworkPreference` and `VideoFrameBufferType`, the enums gn
+    generates from C++ headers (`//api:priority_enums`,
+    `//rtc_base:network_monitor_enums`, `//api/video:video_frame_enums`).
+
+  To regenerate it, in the same gn build: unzip
+  `gen/rtc_base/base_java_jni.srcjar` and
+  `gen/sdk/android/generated_*_jni.srcjar` (except the `dav1d`, `libvpx_*`
+  and `libaom_*` ones) without `org/jni_zero/GEN_JNI.java`; build the three
+  enum targets and unzip their srcjars; and run the `generate-final` command
+  of `libjingle_peerconnection_so__jni_registration` (see
+  `ninja -t commands`) on a copy of its `.javasources.txt` with those five
+  classes removed, and unzip its srcjar.
 - **`sdk/android/android_only_jni_exports.lst`**: Chromium's
   `build/android/android_only_jni_exports.lst` (the linker version script
   that exports only `JNI_OnLoad` and `Java_*`), without its two Chromium-only
